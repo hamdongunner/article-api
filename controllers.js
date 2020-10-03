@@ -1,6 +1,7 @@
 const validate = require("validate.js");
 const validator = require("./tools/validator.tools");
-const { ReE, ReS } = require("./tools/helpers.tools");
+const { ReE, ReS, hashMyPassword } = require("./tools/helpers.tools");
+var jwt = require("jsonwebtoken");
 
 /**
  * This is the default function fot route / GET
@@ -101,6 +102,38 @@ module.exports.editArticle = (req, res) => {
 
   // return
   return ReS(res, article);
+};
+
+const user = { id: 1, email: "me@mewo.com", password: "admin" }; // Dummy
+
+module.exports.login = (req, res) => {
+  const isNotValid = validate(req.body, validator.login());
+  if (isNotValid) return ReE(res, isNotValid);
+
+  if (req.body.email != user.email || req.body.password != user.password)
+    return ReE(res, "User is not valid");
+
+  var token = jwt.sign({ id: user.id }, "shhhhh");
+  return ReS(res, token);
+};
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+module.exports.register = async (req, res) => {
+  // validate
+  const isNotValid = validate(req.body, validator.register());
+  if (isNotValid) return ReE(res, isNotValid);
+
+  // check the email in the DB
+
+  // hash to the password
+  const hash = await hashMyPassword(req.body.password);
+  return ReS(res, { hash });
+
+  // save to DB
 };
 
 // module.exports = home;

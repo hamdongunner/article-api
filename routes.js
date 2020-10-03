@@ -5,15 +5,21 @@ const {
   getOneArticle,
   addArticle,
   editArticle,
+  login,
+  register
 } = require("./controllers");
-const { userOne } = require("./middleware");
+const { userOne, auth } = require("./middleware");
 
-router.get("/articles", getArticles);
+router.post("/login", login);
+
+router.post("/register", register);
+
+router.get("/articles", auth, getArticles);
 // one
 router.get("/article/:id", getOneArticle);
 // add one
-router.post("/article", userOne, addArticle);
+router.post("/article", auth, addArticle);
 // edit
-router.put("/article/:id", userOne, editArticle);
+router.put("/article/:id", auth, editArticle);
 
 module.exports = router;
